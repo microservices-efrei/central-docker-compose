@@ -1,0 +1,8 @@
+version: "3.8"
+
+services:
+  # Ce service pourrait par exemple gérer les dépendances ou un service de centralisation
+  # mais on n'a pas besoin de configurer chaque service ici, car ils ont leurs propres fichiers docker-compose.
+  central_service:
+    image: node:16
+    command: bash -c "echo 'Gestion centrale des services'"
