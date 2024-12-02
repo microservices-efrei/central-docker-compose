@@ -3,7 +3,7 @@
 # Nom du réseau
 NETWORK_NAME="backend"
 
-# Vérifie si le réseau existe
+# Vérifie si le réseau existe et crée-le si nécessaire
 if ! docker network ls | grep -q "$NETWORK_NAME"; then
   echo "Le réseau $NETWORK_NAME n'existe pas. Création en cours..."
   docker network create "$NETWORK_NAME"
@@ -12,7 +12,22 @@ else
   echo "Le réseau $NETWORK_NAME existe déjà."
 fi
 
-# Fonction pour vérifier si un répertoire existe
+# Lancer le docker-compose de central (création des bases de données)
+echo "Lancement du docker-compose pour central..."
+cd ../central-docker-compose || exit
+docker-compose up -d
+cd - || exit
+
+# Attendre que PostgreSQL soit prêt
+echo "Attente de la base de données PostgreSQL..."
+until docker-compose exec -T postgres pg_isready -U root -d postgres; do
+  echo "PostgreSQL n'est pas prêt, nouvelle tentative dans 2 secondes..."
+  sleep 2
+done
+
+# Lancer les services dépendants de PostgreSQL
+echo "PostgreSQL est prêt. Lancement des autres services..."
+
 check_and_run() {
   local service=$1
   local service_path=$2
@@ -27,22 +42,10 @@ check_and_run() {
   fi
 }
 
-
-# Lancer le docker-compose de user-service
+# Lancer les services
 check_and_run "User" "../user-service"
-
-# Lancer le docker-compose de book-service
 check_and_run "Book" "../book-service"
-
-# Lancer le docker-compose de borrowing-service
 check_and_run "Borrowing" "../borrowing-service"
 
-
-
-# Retourner dans le dossier principal
-cd ../central-docker-compose || exit
-
-# Afficher un message pour indiquer que tous les services ont été traités
-
-echo "Tous les services ont été traités!"
-
+# Afficher un message de fin
+echo "Tous les services ont été lancés avec succès !"
