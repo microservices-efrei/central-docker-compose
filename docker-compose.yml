@@ -30,6 +30,19 @@ services:
       - "5050:80"
     depends_on:
       - postgres
+    
+  # Service RabbitMQ
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq
+    networks:
+      - backend
+    ports:
+      - "5672:5672"  # Port pour la communication avec RabbitMQ
+      - "15672:15672" # Port pour l'interface de gestion de RabbitMQ
+    environment:
+      RABBITMQ_DEFAULT_USER: micro-service
+      RABBITMQ_DEFAULT_PASS: password
 
 volumes:
   central_postgres_data:
