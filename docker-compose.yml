@@ -1,8 +1,40 @@
+# docker central
 version: "3.8"
 
 services:
-  # Ce service pourrait par exemple gérer les dépendances ou un service de centralisation
-  # mais on n'a pas besoin de configurer chaque service ici, car ils ont leurs propres fichiers docker-compose.
-  central_service:
-    image: node:16
-    command: bash -c "echo 'Gestion centrale des services'"
+  # Service PostgreSQL
+  postgres:
+    image: postgres:14
+    container_name: central-postgres
+    networks:
+      - backend
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - central_postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+
+  # Service pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: central-pgadmin
+    networks:
+      - backend
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  central_postgres_data:
+    driver: local
+
+networks:
+  backend:
+    external: true
