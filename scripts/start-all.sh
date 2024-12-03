@@ -26,7 +26,17 @@ until docker-compose exec -T postgres pg_isready -U root -d postgres; do
 done
 
 # Lancer les services dépendants de PostgreSQL
-echo "PostgreSQL est prêt. Lancement des autres services..."
+echo "PostgreSQL est prêt."
+
+# Attendre que RabbitMQ soit prêt
+echo "Attente de RabbitMQ..."
+until docker-compose exec -T rabbitmq rabbitmqctl status; do
+  echo "RabbitMQ n'est pas prêt, nouvelle tentative dans 2 secondes..."
+  sleep 2
+done
+
+echo "RabbitMQ est prêt. Lancement des services..."
+
 
 check_and_run() {
   local service=$1
