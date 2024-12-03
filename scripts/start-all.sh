@@ -57,5 +57,5 @@ check_and_run "User" "../user-service"
 check_and_run "Book" "../book-service"
 check_and_run "Borrowing" "../borrowing-service"
 
-# Afficher un message de fin
+# Afficher un message de fin :)
 echo "Tous les services ont été lancés avec succès !"
