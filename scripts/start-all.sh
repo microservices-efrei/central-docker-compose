@@ -56,6 +56,7 @@ check_and_run() {
 check_and_run "User" "../user-service"
 check_and_run "Book" "../book-service"
 check_and_run "Borrowing" "../borrowing-service"
+check_and_run "ApiGateway" "../api-gateway"
 
 # Afficher un message de fin :)
 echo "Tous les services ont été lancés avec succès !"
